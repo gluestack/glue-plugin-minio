@@ -56,8 +56,12 @@ export class PluginInstanceContainerController
       this.callerInstance.gluePluginStore.get("minio_credentials");
 
     return {
-      MINIO_ROOT_USER: minio_credentials.username,
-      MINIO_ROOT_PASSWORD: minio_credentials.password,
+      MINIO_END_POINT: "127.0.0.1",
+      MINIO_PORT: this.getPortNumber(),
+      MINIO_USE_SSL: false,
+      MINIO_ACCESS_KEY: minio_credentials.username,
+      MINIO_SECRET_KEY: minio_credentials.password,
+      MINIO_BUCKET: this.getBucketName(),
     };
   }
 
@@ -211,10 +215,9 @@ export class PluginInstanceContainerController
                     );
                     console.log();
                     console.log(`Credentials to login in minio console: `);
-                    console.log(`username: ${this.getEnv().MINIO_ROOT_USER}`);
-                    console.log(
-                      `password: ${this.getEnv().MINIO_ROOT_PASSWORD}`,
-                    );
+                    console.log(`username: ${this.getEnv().MINIO_ACCESS_KEY}`);
+                    console.log(`password: ${this.getEnv().MINIO_SECRET_KEY}`);
+                    console.log(this.getEnv());
                     console.log("\x1b[0m");
                     return resolve(true);
                   },
