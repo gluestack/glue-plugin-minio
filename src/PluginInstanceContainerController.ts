@@ -2,8 +2,11 @@ const { DockerodeHelper } = require("@gluestack/helpers");
 import IApp from "@gluestack/framework/types/app/interface/IApp";
 import IInstance from "@gluestack/framework/types/plugin/interface/IInstance";
 import IContainerController from "@gluestack/framework/types/plugin/interface/IContainerController";
+import { IMinio } from "./interfaces/IMinio";
 
-export class PluginInstanceContainerController implements IContainerController {
+export class PluginInstanceContainerController
+  implements IContainerController, IMinio
+{
   app: IApp;
   status: "up" | "down" = "down";
   portNumber: number;
@@ -11,6 +14,7 @@ export class PluginInstanceContainerController implements IContainerController {
   containerId: string;
   dockerfile: string;
   callerInstance: IInstance;
+  bucketName: string = "public";
 
   constructor(app: IApp, callerInstance: IInstance) {
     this.app = app;
@@ -23,6 +27,10 @@ export class PluginInstanceContainerController implements IContainerController {
     this.setContainerId(
       this.callerInstance.gluePluginStore.get("container_id"),
     );
+  }
+
+  getBucketName(): string {
+    return this.bucketName;
   }
 
   getCallerInstance(): IInstance {

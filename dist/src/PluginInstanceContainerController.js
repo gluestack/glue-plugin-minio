@@ -41,6 +41,7 @@ var DockerodeHelper = require("@gluestack/helpers").DockerodeHelper;
 var PluginInstanceContainerController = (function () {
     function PluginInstanceContainerController(app, callerInstance) {
         this.status = "down";
+        this.bucketName = "public";
         this.app = app;
         this.callerInstance = callerInstance;
         this.setStatus(this.callerInstance.gluePluginStore.get("status"));
@@ -48,6 +49,9 @@ var PluginInstanceContainerController = (function () {
         this.setConsolePortNumber(this.callerInstance.gluePluginStore.get("console_port_number"));
         this.setContainerId(this.callerInstance.gluePluginStore.get("container_id"));
     }
+    PluginInstanceContainerController.prototype.getBucketName = function () {
+        return this.bucketName;
+    };
     PluginInstanceContainerController.prototype.getCallerInstance = function () {
         return this.callerInstance;
     };
