@@ -17,7 +17,9 @@ export class PluginInstanceContainerController implements IContainerController {
     this.callerInstance = callerInstance;
     this.setStatus(this.callerInstance.gluePluginStore.get("status"));
     this.setPortNumber(this.callerInstance.gluePluginStore.get("port_number"));
-    this.setConsolePortNumber(this.callerInstance.gluePluginStore.get("console_port_number"));
+    this.setConsolePortNumber(
+      this.callerInstance.gluePluginStore.get("console_port_number"),
+    );
     this.setContainerId(
       this.callerInstance.gluePluginStore.get("container_id"),
     );
@@ -33,10 +35,17 @@ export class PluginInstanceContainerController implements IContainerController {
       password: "password",
     };
 
-    if (!this.callerInstance.gluePluginStore.get("minio_credentials") || !this.callerInstance.gluePluginStore.get("minio_credentials").username)
-      this.callerInstance.gluePluginStore.set("minio_credentials", minio_credentials);
+    if (
+      !this.callerInstance.gluePluginStore.get("minio_credentials") ||
+      !this.callerInstance.gluePluginStore.get("minio_credentials").username
+    )
+      this.callerInstance.gluePluginStore.set(
+        "minio_credentials",
+        minio_credentials,
+      );
 
-    minio_credentials = this.callerInstance.gluePluginStore.get("minio_credentials");
+    minio_credentials =
+      this.callerInstance.gluePluginStore.get("minio_credentials");
 
     return {
       MINIO_ROOT_USER: minio_credentials.username,
@@ -58,22 +67,22 @@ export class PluginInstanceContainerController implements IContainerController {
             {
               HostPort: this.getConsolePortNumber(true).toString(),
             },
-          ]
+          ],
         },
+        Binds: [
+          `${
+            process.cwd() +
+            this.callerInstance.getInstallationPath().substring(1)
+          }/data:/data`,
+        ],
       },
       ExposedPorts: {
         "9000/tcp": {},
-        "9001/tcp": {}
+        "9001/tcp": {},
       },
-      Cmd: [
-        'server',
-        '/data',
-        '--console-address',
-        ':9001'
-      ],
+      Cmd: ["server", "/data", "--console-address", ":9001"],
     };
   }
-
 
   getStatus(): "up" | "down" {
     return this.status;
@@ -112,7 +121,10 @@ export class PluginInstanceContainerController implements IContainerController {
   }
 
   setConsolePortNumber(consolePortNumber: number) {
-    this.callerInstance.gluePluginStore.set("console_port_number", consolePortNumber || null);
+    this.callerInstance.gluePluginStore.set(
+      "console_port_number",
+      consolePortNumber || null,
+    );
     return (this.consolePortNumber = consolePortNumber || null);
   }
 
@@ -129,14 +141,15 @@ export class PluginInstanceContainerController implements IContainerController {
     return (this.dockerfile = dockerfile || null);
   }
 
-  getConfig(): any { }
+  getConfig(): any {}
 
   async up() {
     let ports =
       this.callerInstance.callerPlugin.gluePluginStore.get("ports") || [];
 
     let consolePorts =
-      this.callerInstance.callerPlugin.gluePluginStore.get("console_ports") || [];
+      this.callerInstance.callerPlugin.gluePluginStore.get("console_ports") ||
+      [];
 
     await new Promise(async (resolve, reject) => {
       DockerodeHelper.getPort(this.getPortNumber(true), ports)
@@ -162,9 +175,11 @@ export class PluginInstanceContainerController implements IContainerController {
                     containerId: string;
                     dockerfile: string;
                   }) => {
-                    DockerodeHelper.generateDockerFile(this.getDockerJson(),
+                    DockerodeHelper.generateDockerFile(
+                      this.getDockerJson(),
                       this.getEnv(),
-                      this.callerInstance.getName())
+                      this.callerInstance.getName(),
+                    );
                     this.setStatus(status);
                     this.setPortNumber(portNumber);
                     this.setConsolePortNumber(consolePort);
@@ -180,13 +195,19 @@ export class PluginInstanceContainerController implements IContainerController {
                       consolePorts,
                     );
                     console.log("\x1b[32m");
-                    console.log(`API: http://localhost:${this.getPortNumber()}`);
-                    console.log(`Console: http://localhost:${this.getConsolePortNumber()}/ open in browser`);
+                    console.log(
+                      `API: http://localhost:${this.getPortNumber()}`,
+                    );
+                    console.log(
+                      `Console: http://localhost:${this.getConsolePortNumber()}/ open in browser`,
+                    );
                     console.log();
                     console.log(`Credentials to login in minio console: `);
                     console.log(`username: ${this.getEnv().MINIO_ROOT_USER}`);
-                    console.log(`password: ${this.getEnv().MINIO_ROOT_PASSWORD}`);
-                    console.log("\x1b[0m")
+                    console.log(
+                      `password: ${this.getEnv().MINIO_ROOT_PASSWORD}`,
+                    );
+                    console.log("\x1b[0m");
                     return resolve(true);
                   },
                 )
@@ -208,7 +229,8 @@ export class PluginInstanceContainerController implements IContainerController {
     let ports =
       this.callerInstance.callerPlugin.gluePluginStore.get("ports") || [];
     let consolePorts =
-      this.callerInstance.callerPlugin.gluePluginStore.get("console_ports") || [];
+      this.callerInstance.callerPlugin.gluePluginStore.get("console_ports") ||
+      [];
     await new Promise(async (resolve, reject) => {
       DockerodeHelper.down(this.getContainerId(), this.callerInstance.getName())
         .then(() => {
@@ -223,7 +245,10 @@ export class PluginInstanceContainerController implements IContainerController {
           if (consoleIndex !== -1) {
             consolePorts.splice(consoleIndex, 1);
           }
-          this.callerInstance.callerPlugin.gluePluginStore.set("console_ports", consolePorts);
+          this.callerInstance.callerPlugin.gluePluginStore.set(
+            "console_ports",
+            consolePorts,
+          );
 
           this.setPortNumber(null);
           this.setConsolePortNumber(null);
@@ -236,5 +261,5 @@ export class PluginInstanceContainerController implements IContainerController {
     });
   }
 
-  async build() { }
+  async build() {}
 }

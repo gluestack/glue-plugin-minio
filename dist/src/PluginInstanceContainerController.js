@@ -14,7 +14,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
             if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
             if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
@@ -56,9 +56,11 @@ var PluginInstanceContainerController = (function () {
             username: "gluestack",
             password: "password"
         };
-        if (!this.callerInstance.gluePluginStore.get("minio_credentials") || !this.callerInstance.gluePluginStore.get("minio_credentials").username)
+        if (!this.callerInstance.gluePluginStore.get("minio_credentials") ||
+            !this.callerInstance.gluePluginStore.get("minio_credentials").username)
             this.callerInstance.gluePluginStore.set("minio_credentials", minio_credentials);
-        minio_credentials = this.callerInstance.gluePluginStore.get("minio_credentials");
+        minio_credentials =
+            this.callerInstance.gluePluginStore.get("minio_credentials");
         return {
             MINIO_ROOT_USER: minio_credentials.username,
             MINIO_ROOT_PASSWORD: minio_credentials.password
@@ -79,18 +81,17 @@ var PluginInstanceContainerController = (function () {
                             HostPort: this.getConsolePortNumber(true).toString()
                         },
                     ]
-                }
+                },
+                Binds: [
+                    "".concat(process.cwd() +
+                        this.callerInstance.getInstallationPath().substring(1), "/data:/data"),
+                ]
             },
             ExposedPorts: {
                 "9000/tcp": {},
                 "9001/tcp": {}
             },
-            Cmd: [
-                'server',
-                '/data',
-                '--console-address',
-                ':9001'
-            ]
+            Cmd: ["server", "/data", "--console-address", ":9001"]
         };
     };
     PluginInstanceContainerController.prototype.getStatus = function () {
@@ -144,7 +145,8 @@ var PluginInstanceContainerController = (function () {
                 switch (_a.label) {
                     case 0:
                         ports = this.callerInstance.callerPlugin.gluePluginStore.get("ports") || [];
-                        consolePorts = this.callerInstance.callerPlugin.gluePluginStore.get("console_ports") || [];
+                        consolePorts = this.callerInstance.callerPlugin.gluePluginStore.get("console_ports") ||
+                            [];
                         return [4, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
                                 var _this = this;
                                 return __generator(this, function (_a) {
@@ -210,7 +212,8 @@ var PluginInstanceContainerController = (function () {
                 switch (_a.label) {
                     case 0:
                         ports = this.callerInstance.callerPlugin.gluePluginStore.get("ports") || [];
-                        consolePorts = this.callerInstance.callerPlugin.gluePluginStore.get("console_ports") || [];
+                        consolePorts = this.callerInstance.callerPlugin.gluePluginStore.get("console_ports") ||
+                            [];
                         return [4, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
                                 var _this = this;
                                 return __generator(this, function (_a) {

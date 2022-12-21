@@ -12,7 +12,7 @@ import IGlueStorePlugin from "@gluestack/framework/types/store/interface/IGluePl
 export class GlueStackPlugin implements IPlugin, IManagesInstances, ILifeCycle {
   app: IApp;
   instances: IInstance[];
-	type: 'stateless' | 'stateful' | 'devonly' = 'stateless';
+  type: "stateless" | "stateful" | "devonly" = "devonly";
   gluePluginStore: IGlueStorePlugin;
 
   constructor(app: IApp, gluePluginStore: IGlueStorePlugin) {
@@ -37,7 +37,7 @@ export class GlueStackPlugin implements IPlugin, IManagesInstances, ILifeCycle {
     return packageJSON.version;
   }
 
-  getType(): 'stateless' | 'stateful' | 'devonly' {
+  getType(): "stateless" | "stateful" | "devonly" {
     return this.type;
   }
 
@@ -46,7 +46,7 @@ export class GlueStackPlugin implements IPlugin, IManagesInstances, ILifeCycle {
   }
 
   getInstallationPath(target: string): string {
-    return `./${target}`;
+    return `./backend/storage/${target}`;
   }
 
   async runPostInstall(instanceName: string, target: string) {
