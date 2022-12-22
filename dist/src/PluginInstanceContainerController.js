@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.PluginInstanceContainerController = void 0;
 var DockerodeHelper = require("@gluestack/helpers").DockerodeHelper;
+var constructEnv_1 = require("./helpers/constructEnv");
 var PluginInstanceContainerController = (function () {
     function PluginInstanceContainerController(app, callerInstance) {
         this.status = "down";
@@ -183,12 +184,14 @@ var PluginInstanceContainerController = (function () {
                                                         console.log("\x1b[32m");
                                                         console.log("API: http://localhost:".concat(_this.getPortNumber()));
                                                         console.log("Console: http://localhost:".concat(_this.getConsolePortNumber(), "/ open in browser"));
-                                                        console.log();
+                                                        console.log("\x1b[0m");
+                                                        console.log("\x1b[36m");
                                                         console.log("Credentials to login in minio console: ");
                                                         console.log("username: ".concat(_this.getEnv().MINIO_ACCESS_KEY));
                                                         console.log("password: ".concat(_this.getEnv().MINIO_SECRET_KEY));
-                                                        console.log(_this.getEnv());
                                                         console.log("\x1b[0m");
+                                                        console.log("Env for using minio API: ");
+                                                        console.log((0, constructEnv_1.constructEnv)(_this.getEnv()));
                                                         return resolve(true);
                                                     })["catch"](function (e) {
                                                         return reject(e);

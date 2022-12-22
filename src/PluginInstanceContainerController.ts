@@ -3,6 +3,7 @@ import IApp from "@gluestack/framework/types/app/interface/IApp";
 import IInstance from "@gluestack/framework/types/plugin/interface/IInstance";
 import IContainerController from "@gluestack/framework/types/plugin/interface/IContainerController";
 import { IMinio } from "./interfaces/IMinio";
+import { constructEnv } from "./helpers/constructEnv";
 
 export class PluginInstanceContainerController
   implements IContainerController, IMinio
@@ -213,12 +214,14 @@ export class PluginInstanceContainerController
                     console.log(
                       `Console: http://localhost:${this.getConsolePortNumber()}/ open in browser`,
                     );
-                    console.log();
+                    console.log("\x1b[0m");
+                    console.log("\x1b[36m");
                     console.log(`Credentials to login in minio console: `);
                     console.log(`username: ${this.getEnv().MINIO_ACCESS_KEY}`);
                     console.log(`password: ${this.getEnv().MINIO_SECRET_KEY}`);
-                    console.log(this.getEnv());
                     console.log("\x1b[0m");
+                    console.log(`Env for using minio API: `);
+                    console.log(constructEnv(this.getEnv()));
                     return resolve(true);
                   },
                 )
