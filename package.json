@@ -1,6 +1,6 @@
 {
   "name": "@gluestack/glue-plugin-minio",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "minio devonly plugin for gluestack framework",
   "repository": {
     "type": "git",
@@ -14,7 +14,8 @@
   "license": "ISC",
   "dependencies": {
     "@gluestack/helpers": "^0.0.7",
-    "@types/node": "^18.11.17"
+    "@types/node": "^18.11.17",
+    "minio": "^7.0.32"
   },
   "main": "dist/src/index.js",
   "scripts": {

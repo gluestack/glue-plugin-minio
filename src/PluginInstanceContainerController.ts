@@ -4,6 +4,7 @@ import IInstance from "@gluestack/framework/types/plugin/interface/IInstance";
 import IContainerController from "@gluestack/framework/types/plugin/interface/IContainerController";
 import { IMinio } from "./interfaces/IMinio";
 import { constructEnv } from "./helpers/constructEnv";
+import { createBucket } from "./helpers/createBucket";
 
 export class PluginInstanceContainerController
   implements IContainerController, IMinio
@@ -186,13 +187,7 @@ export class PluginInstanceContainerController
                     status: "up" | "down";
                     portNumber: number;
                     containerId: string;
-                    dockerfile: string;
                   }) => {
-                    DockerodeHelper.generateDockerFile(
-                      this.getDockerJson(),
-                      this.getEnv(),
-                      this.callerInstance.getName(),
-                    );
                     this.setStatus(status);
                     this.setPortNumber(portNumber);
                     this.setConsolePortNumber(consolePort);
@@ -222,7 +217,18 @@ export class PluginInstanceContainerController
                     console.log("\x1b[0m");
                     console.log(`Env for using minio API: `);
                     console.log(constructEnv(this.getEnv()));
-                    return resolve(true);
+
+                    createBucket(this)
+                      .then(() => {
+                        return resolve(true);
+                      })
+                      .catch(() => {
+                        console.log("\x1b[33m");
+                        console.log(
+                          `Could not create public bucket, please create one manually`,
+                        );
+                        console.log("\x1b[0m");
+                      });
                   },
                 )
                 .catch((e: any) => {

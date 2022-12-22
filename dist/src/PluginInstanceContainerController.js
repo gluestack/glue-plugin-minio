@@ -39,6 +39,7 @@ exports.__esModule = true;
 exports.PluginInstanceContainerController = void 0;
 var DockerodeHelper = require("@gluestack/helpers").DockerodeHelper;
 var constructEnv_1 = require("./helpers/constructEnv");
+var createBucket_1 = require("./helpers/createBucket");
 var PluginInstanceContainerController = (function () {
     function PluginInstanceContainerController(app, callerInstance) {
         this.status = "down";
@@ -172,7 +173,6 @@ var PluginInstanceContainerController = (function () {
                                                     DockerodeHelper.up(this.getDockerJson(), this.getEnv(), this.portNumber, this.callerInstance.getName())
                                                         .then(function (_a) {
                                                         var status = _a.status, portNumber = _a.portNumber, containerId = _a.containerId;
-                                                        DockerodeHelper.generateDockerFile(_this.getDockerJson(), _this.getEnv(), _this.callerInstance.getName());
                                                         _this.setStatus(status);
                                                         _this.setPortNumber(portNumber);
                                                         _this.setConsolePortNumber(consolePort);
@@ -192,7 +192,14 @@ var PluginInstanceContainerController = (function () {
                                                         console.log("\x1b[0m");
                                                         console.log("Env for using minio API: ");
                                                         console.log((0, constructEnv_1.constructEnv)(_this.getEnv()));
-                                                        return resolve(true);
+                                                        (0, createBucket_1.createBucket)(_this)
+                                                            .then(function () {
+                                                            return resolve(true);
+                                                        })["catch"](function () {
+                                                            console.log("\x1b[33m");
+                                                            console.log("Could not create public bucket, please create one manually");
+                                                            console.log("\x1b[0m");
+                                                        });
                                                     })["catch"](function (e) {
                                                         return reject(e);
                                                     });
