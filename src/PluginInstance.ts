@@ -7,7 +7,8 @@ import IContainerController from "@gluestack/framework/types/plugin/interface/IC
 import IHasContainerController from "@gluestack/framework/types/plugin/interface/IHasContainerController";
 import IGlueStorePlugin from "@gluestack/framework/types/store/interface/IGluePluginStore";
 
-export class PluginInstance implements IInstance, IHasContainerController, ILifeCycle
+export class PluginInstance
+  implements IInstance, IHasContainerController, ILifeCycle
 {
   app: IApp;
   name: string;
@@ -29,6 +30,7 @@ export class PluginInstance implements IInstance, IHasContainerController, ILife
     this.callerPlugin = callerPlugin;
     this.gluePluginStore = gluePluginStore;
     this.installationPath = installationPath;
+    //@ts-ignore
     this.containerController = new PluginInstanceContainerController(app, this);
   }
 

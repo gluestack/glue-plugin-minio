@@ -58,70 +58,125 @@ var PluginInstanceContainerController = (function () {
         return this.callerInstance;
     };
     PluginInstanceContainerController.prototype.getEnv = function () {
-        var minio_credentials = {
-            username: "gluestack",
-            password: "password"
-        };
-        if (!this.callerInstance.gluePluginStore.get("minio_credentials") ||
-            !this.callerInstance.gluePluginStore.get("minio_credentials").username)
-            this.callerInstance.gluePluginStore.set("minio_credentials", minio_credentials);
-        minio_credentials =
-            this.callerInstance.gluePluginStore.get("minio_credentials");
-        return {
-            MINIO_END_POINT: "127.0.0.1",
-            MINIO_PORT: this.getPortNumber(),
-            MINIO_USE_SSL: false,
-            MINIO_ACCESS_KEY: minio_credentials.username,
-            MINIO_SECRET_KEY: minio_credentials.password,
-            MINIO_BUCKET: this.getBucketName()
-        };
+        return __awaiter(this, void 0, void 0, function () {
+            var minio_credentials;
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        minio_credentials = {
+                            username: "gluestack",
+                            password: "password"
+                        };
+                        if (!this.callerInstance.gluePluginStore.get("minio_credentials") ||
+                            !this.callerInstance.gluePluginStore.get("minio_credentials").username)
+                            this.callerInstance.gluePluginStore.set("minio_credentials", minio_credentials);
+                        minio_credentials =
+                            this.callerInstance.gluePluginStore.get("minio_credentials");
+                        _a = {
+                            MINIO_END_POINT: "127.0.0.1"
+                        };
+                        return [4, this.getPortNumber()];
+                    case 1: return [2, (_a.MINIO_PORT = _b.sent(),
+                            _a.MINIO_USE_SSL = false,
+                            _a.MINIO_ACCESS_KEY = minio_credentials.username,
+                            _a.MINIO_SECRET_KEY = minio_credentials.password,
+                            _a.MINIO_BUCKET = this.getBucketName(),
+                            _a)];
+                }
+            });
+        });
     };
     PluginInstanceContainerController.prototype.getDockerJson = function () {
-        return {
-            Image: "minio/minio",
-            HostConfig: {
-                PortBindings: {
-                    "9000/tcp": [
-                        {
-                            HostPort: this.getPortNumber(true).toString()
-                        },
-                    ],
-                    "9001/tcp": [
-                        {
-                            HostPort: this.getConsolePortNumber(true).toString()
-                        },
-                    ]
-                },
-                Binds: [
-                    "".concat(process.cwd() +
-                        this.callerInstance.getInstallationPath().substring(1), "/data:/data"),
-                ]
-            },
-            ExposedPorts: {
-                "9000/tcp": {},
-                "9001/tcp": {}
-            },
-            Cmd: ["server", "/data", "--console-address", ":9001"]
-        };
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, _b;
+            var _c, _d, _e, _f, _g;
+            return __generator(this, function (_h) {
+                switch (_h.label) {
+                    case 0:
+                        _c = {
+                            Image: "minio/minio"
+                        };
+                        _d = {};
+                        _e = {};
+                        _a = "9000/tcp";
+                        _f = {};
+                        return [4, this.getPortNumber()];
+                    case 1:
+                        _e[_a] = [
+                            (_f.HostPort = (_h.sent()).toString(),
+                                _f)
+                        ];
+                        _b = "9001/tcp";
+                        _g = {};
+                        return [4, this.getConsolePortNumber()];
+                    case 2: return [2, (_c.HostConfig = (_d.PortBindings = (_e[_b] = [
+                            (_g.HostPort = (_h.sent()).toString(),
+                                _g)
+                        ],
+                            _e),
+                            _d.Binds = [
+                                "".concat(process.cwd() +
+                                    this.callerInstance.getInstallationPath().substring(1), "/data:/data"),
+                            ],
+                            _d),
+                            _c.ExposedPorts = {
+                                "9000/tcp": {},
+                                "9001/tcp": {}
+                            },
+                            _c.Cmd = ["server", "/data", "--console-address", ":9001"],
+                            _c)];
+                }
+            });
+        });
     };
     PluginInstanceContainerController.prototype.getStatus = function () {
         return this.status;
     };
     PluginInstanceContainerController.prototype.getPortNumber = function (returnDefault) {
-        if (this.portNumber) {
-            return this.portNumber;
-        }
-        if (returnDefault) {
-            return 9001;
-        }
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2, new Promise(function (resolve, reject) {
+                        if (_this.portNumber) {
+                            return resolve(_this.portNumber);
+                        }
+                        var ports = _this.callerInstance.callerPlugin.gluePluginStore.get("ports") || [];
+                        DockerodeHelper.getPort(10310, ports)
+                            .then(function (port) {
+                            _this.setPortNumber(port);
+                            ports.push(port);
+                            _this.callerInstance.callerPlugin.gluePluginStore.set("ports", ports);
+                            return resolve(_this.portNumber);
+                        })["catch"](function (e) {
+                            reject(e);
+                        });
+                    })];
+            });
+        });
     };
     PluginInstanceContainerController.prototype.getConsolePortNumber = function (returnDefault) {
-        if (this.consolePortNumber) {
-            return this.consolePortNumber;
-        }
-        if (returnDefault) {
-            return 9100;
-        }
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            return __generator(this, function (_a) {
+                return [2, new Promise(function (resolve, reject) {
+                        if (_this.consolePortNumber) {
+                            return resolve(_this.consolePortNumber);
+                        }
+                        var ports = _this.callerInstance.callerPlugin.gluePluginStore.get("console_ports") ||
+                            [];
+                        DockerodeHelper.getPort(9160, ports)
+                            .then(function (port) {
+                            _this.setConsolePortNumber(port);
+                            ports.push(port);
+                            _this.callerInstance.callerPlugin.gluePluginStore.set("console_ports", ports);
+                            return resolve(_this.consolePortNumber);
+                        })["catch"](function (e) {
+                            reject(e);
+                        });
+                    })];
+            });
+        });
     };
     PluginInstanceContainerController.prototype.getContainerId = function () {
         return this.containerId;
@@ -149,73 +204,86 @@ var PluginInstanceContainerController = (function () {
     PluginInstanceContainerController.prototype.getConfig = function () { };
     PluginInstanceContainerController.prototype.up = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var ports, consolePorts;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        ports = this.callerInstance.callerPlugin.gluePluginStore.get("ports") || [];
-                        consolePorts = this.callerInstance.callerPlugin.gluePluginStore.get("console_ports") ||
-                            [];
-                        return [4, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                                var _this = this;
-                                return __generator(this, function (_a) {
-                                    DockerodeHelper.getPort(this.getPortNumber(true), ports)
-                                        .then(function (port) { return __awaiter(_this, void 0, void 0, function () {
-                                        var _this = this;
-                                        return __generator(this, function (_a) {
-                                            DockerodeHelper.getPort(this.getConsolePortNumber(true), consolePorts)
-                                                .then(function (consolePort) { return __awaiter(_this, void 0, void 0, function () {
-                                                var _this = this;
-                                                return __generator(this, function (_a) {
-                                                    this.portNumber = port;
-                                                    this.consolePortNumber = consolePort;
-                                                    DockerodeHelper.up(this.getDockerJson(), this.getEnv(), this.portNumber, this.callerInstance.getName())
-                                                        .then(function (_a) {
-                                                        var status = _a.status, portNumber = _a.portNumber, containerId = _a.containerId;
-                                                        _this.setStatus(status);
-                                                        _this.setPortNumber(portNumber);
-                                                        _this.setConsolePortNumber(consolePort);
-                                                        _this.setContainerId(containerId);
-                                                        ports.push(portNumber);
-                                                        consolePorts.push(consolePort);
-                                                        _this.callerInstance.callerPlugin.gluePluginStore.set("ports", ports);
-                                                        _this.callerInstance.callerPlugin.gluePluginStore.set("console_ports", consolePorts);
-                                                        console.log("\x1b[32m");
-                                                        console.log("API: http://localhost:".concat(_this.getPortNumber()));
-                                                        console.log("Console: http://localhost:".concat(_this.getConsolePortNumber(), "/ open in browser"));
-                                                        console.log("\x1b[0m");
-                                                        console.log("\x1b[36m");
-                                                        console.log("Credentials to login in minio console: ");
-                                                        console.log("username: ".concat(_this.getEnv().MINIO_ACCESS_KEY));
-                                                        console.log("password: ".concat(_this.getEnv().MINIO_SECRET_KEY));
-                                                        console.log("\x1b[0m");
-                                                        console.log("Env for using minio API: ");
-                                                        console.log((0, constructEnv_1.constructEnv)(_this.getEnv()));
-                                                        (0, createBucket_1.createBucket)(_this)
-                                                            .then(function () {
-                                                            return resolve(true);
-                                                        })["catch"](function () {
-                                                            console.log("\x1b[33m");
-                                                            console.log("Could not create public bucket, please create one manually");
+                    case 0: return [4, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                            var _a, _b, _c;
+                            var _this = this;
+                            return __generator(this, function (_d) {
+                                switch (_d.label) {
+                                    case 0:
+                                        _b = (_a = DockerodeHelper).up;
+                                        return [4, this.getDockerJson()];
+                                    case 1:
+                                        _c = [_d.sent()];
+                                        return [4, this.getEnv()];
+                                    case 2:
+                                        _c = _c.concat([_d.sent()]);
+                                        return [4, this.getPortNumber()];
+                                    case 3:
+                                        _b.apply(_a, _c.concat([_d.sent(), this.callerInstance.getName()]))
+                                            .then(function (_a) {
+                                            var status = _a.status, containerId = _a.containerId;
+                                            return __awaiter(_this, void 0, void 0, function () {
+                                                var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
+                                                return __generator(this, function (_s) {
+                                                    switch (_s.label) {
+                                                        case 0:
+                                                            this.setStatus(status);
+                                                            this.setContainerId(containerId);
+                                                            console.log("\x1b[32m");
+                                                            _c = (_b = console).log;
+                                                            _d = "API: http://localhost:".concat;
+                                                            return [4, this.getPortNumber()];
+                                                        case 1:
+                                                            _c.apply(_b, [_d.apply("API: http://localhost:", [_s.sent()])]);
+                                                            _f = (_e = console).log;
+                                                            _g = "Console: http://localhost:".concat;
+                                                            return [4, this.getConsolePortNumber()];
+                                                        case 2:
+                                                            _f.apply(_e, [_g.apply("Console: http://localhost:", [_s.sent(), "/ open in browser"])]);
                                                             console.log("\x1b[0m");
-                                                        });
-                                                    })["catch"](function (e) {
-                                                        return reject(e);
-                                                    });
-                                                    return [2];
+                                                            console.log("\x1b[36m");
+                                                            console.log("Credentials to login in minio console: ");
+                                                            _j = (_h = console).log;
+                                                            _k = "username: ".concat;
+                                                            return [4, this.getEnv()];
+                                                        case 3:
+                                                            _j.apply(_h, [_k.apply("username: ", [(_s.sent()).MINIO_ACCESS_KEY])]);
+                                                            _m = (_l = console).log;
+                                                            _o = "password: ".concat;
+                                                            return [4, this.getEnv()];
+                                                        case 4:
+                                                            _m.apply(_l, [_o.apply("password: ", [(_s.sent()).MINIO_SECRET_KEY])]);
+                                                            console.log("\x1b[0m");
+                                                            console.log("Env for using minio API: ");
+                                                            _q = (_p = console).log;
+                                                            _r = constructEnv_1.constructEnv;
+                                                            return [4, this.getEnv()];
+                                                        case 5:
+                                                            _q.apply(_p, [_r.apply(void 0, [_s.sent()])]);
+                                                            (0, createBucket_1.createBucket)(this)
+                                                                .then(function () {
+                                                                return resolve(true);
+                                                            })["catch"](function () {
+                                                                console.log("\x1b[33m");
+                                                                console.log("Could not create public bucket, please create one manually");
+                                                                console.log("\x1b[0m");
+                                                            });
+                                                            return [2];
+                                                    }
                                                 });
-                                            }); })["catch"](function (e) {
-                                                return reject(e);
                                             });
-                                            return [2];
+                                        })["catch"](function (e) {
+                                            return reject(e);
+                                        })["catch"](function (e) {
+                                            return reject(e);
                                         });
-                                    }); })["catch"](function (e) {
-                                        return reject(e);
-                                    });
-                                    return [2];
-                                });
-                            }); })];
+                                        return [2];
+                                }
+                            });
+                        }); })];
                     case 1:
                         _a.sent();
                         return [2];
@@ -225,40 +293,23 @@ var PluginInstanceContainerController = (function () {
     };
     PluginInstanceContainerController.prototype.down = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var ports, consolePorts;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        ports = this.callerInstance.callerPlugin.gluePluginStore.get("ports") || [];
-                        consolePorts = this.callerInstance.callerPlugin.gluePluginStore.get("console_ports") ||
-                            [];
-                        return [4, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                                var _this = this;
-                                return __generator(this, function (_a) {
-                                    DockerodeHelper.down(this.getContainerId(), this.callerInstance.getName())
-                                        .then(function () {
-                                        _this.setStatus("down");
-                                        var index = ports.indexOf(_this.getPortNumber());
-                                        if (index !== -1) {
-                                            ports.splice(index, 1);
-                                        }
-                                        _this.callerInstance.callerPlugin.gluePluginStore.set("ports", ports);
-                                        var consoleIndex = consolePorts.indexOf(_this.getConsolePortNumber());
-                                        if (consoleIndex !== -1) {
-                                            consolePorts.splice(consoleIndex, 1);
-                                        }
-                                        _this.callerInstance.callerPlugin.gluePluginStore.set("console_ports", consolePorts);
-                                        _this.setPortNumber(null);
-                                        _this.setConsolePortNumber(null);
-                                        _this.setContainerId(null);
-                                        return resolve(true);
-                                    })["catch"](function (e) {
-                                        return reject(e);
-                                    });
-                                    return [2];
+                    case 0: return [4, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                            var _this = this;
+                            return __generator(this, function (_a) {
+                                DockerodeHelper.down(this.getContainerId(), this.callerInstance.getName())
+                                    .then(function () {
+                                    _this.setStatus("down");
+                                    _this.setContainerId(null);
+                                    return resolve(true);
+                                })["catch"](function (e) {
+                                    return reject(e);
                                 });
-                            }); })];
+                                return [2];
+                            });
+                        }); })];
                     case 1:
                         _a.sent();
                         return [2];

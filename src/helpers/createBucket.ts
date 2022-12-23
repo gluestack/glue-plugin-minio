@@ -1,30 +1,30 @@
-import { PluginInstanceContainerController } from "src/PluginInstanceContainerController";
+import { PluginInstanceContainerController } from "../PluginInstanceContainerController";
 const Minio = require("minio");
 
-function getMinioClient(
-  çontainerController: PluginInstanceContainerController,
+async function getMinioClient(
+  containerController: PluginInstanceContainerController,
 ) {
   return new Minio.Client({
-    endPoint: çontainerController.getEnv().MINIO_END_POINT,
-    port: çontainerController.getEnv().MINIO_PORT,
-    useSSL: çontainerController.getEnv().MINIO_USE_SSL,
-    accessKey: çontainerController.getEnv().MINIO_ACCESS_KEY,
-    secretKey: çontainerController.getEnv().MINIO_SECRET_KEY,
+    endPoint: (await containerController.getEnv()).MINIO_END_POINT,
+    port: (await containerController.getEnv()).MINIO_PORT,
+    useSSL: (await containerController.getEnv()).MINIO_USE_SSL,
+    accessKey: (await containerController.getEnv()).MINIO_ACCESS_KEY,
+    secretKey: (await containerController.getEnv()).MINIO_SECRET_KEY,
   });
 }
 
 async function tryCreateBucket(
-  çontainerController: PluginInstanceContainerController,
+  containerController: PluginInstanceContainerController,
 ) {
-  return new Promise((resolve, reject) => {
-    const minioClient = getMinioClient(çontainerController);
+  return new Promise(async (resolve, reject) => {
+    const minioClient = await getMinioClient(containerController);
     minioClient.bucketExists(
-      çontainerController.getEnv().MINIO_BUCKET,
-      function (err: any, exists: boolean) {
+      (await containerController.getEnv()).MINIO_BUCKET,
+      async function (err: any, exists: boolean) {
         if (exists) return resolve(true);
         if (err) return reject(err);
         minioClient.makeBucket(
-          çontainerController.getEnv().MINIO_BUCKET,
+          (await containerController.getEnv()).MINIO_BUCKET,
           "us-east-1",
           function (err: any) {
             if (err) return reject(err);
@@ -70,13 +70,13 @@ async function tryCreateBucket(
 }
 
 export async function createBucket(
-  çontainerController: PluginInstanceContainerController,
+  containerController: PluginInstanceContainerController,
 ) {
   let count = 0;
 
   return new Promise((resolve, reject) => {
     let interval = setInterval(async () => {
-      await tryCreateBucket(çontainerController)
+      await tryCreateBucket(containerController)
         .then((res: any) => {
           clearInterval(interval);
           return resolve(true);

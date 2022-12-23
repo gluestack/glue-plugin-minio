@@ -39,7 +39,7 @@ export class PluginInstanceContainerController
     return this.callerInstance;
   }
 
-  getEnv() {
+  async getEnv() {
     let minio_credentials = {
       username: "gluestack",
       password: "password",
@@ -59,7 +59,7 @@ export class PluginInstanceContainerController
 
     return {
       MINIO_END_POINT: "127.0.0.1",
-      MINIO_PORT: this.getPortNumber(),
+      MINIO_PORT: await this.getPortNumber(),
       MINIO_USE_SSL: false,
       MINIO_ACCESS_KEY: minio_credentials.username,
       MINIO_SECRET_KEY: minio_credentials.password,
@@ -67,19 +67,19 @@ export class PluginInstanceContainerController
     };
   }
 
-  getDockerJson() {
+  async getDockerJson() {
     return {
       Image: "minio/minio",
       HostConfig: {
         PortBindings: {
           "9000/tcp": [
             {
-              HostPort: this.getPortNumber(true).toString(),
+              HostPort: (await this.getPortNumber()).toString(),
             },
           ],
           "9001/tcp": [
             {
-              HostPort: this.getConsolePortNumber(true).toString(),
+              HostPort: (await this.getConsolePortNumber()).toString(),
             },
           ],
         },
@@ -102,22 +102,49 @@ export class PluginInstanceContainerController
     return this.status;
   }
 
-  getPortNumber(returnDefault?: boolean): number {
-    if (this.portNumber) {
-      return this.portNumber;
-    }
-    if (returnDefault) {
-      return 9001;
-    }
+  //@ts-ignore
+  async getPortNumber(returnDefault?: boolean) {
+    return new Promise((resolve, reject) => {
+      if (this.portNumber) {
+        return resolve(this.portNumber);
+      }
+      let ports =
+        this.callerInstance.callerPlugin.gluePluginStore.get("ports") || [];
+      DockerodeHelper.getPort(10310, ports)
+        .then((port: number) => {
+          this.setPortNumber(port);
+          ports.push(port);
+          this.callerInstance.callerPlugin.gluePluginStore.set("ports", ports);
+          return resolve(this.portNumber);
+        })
+        .catch((e: any) => {
+          reject(e);
+        });
+    });
   }
 
-  getConsolePortNumber(returnDefault?: boolean): number {
-    if (this.consolePortNumber) {
-      return this.consolePortNumber;
-    }
-    if (returnDefault) {
-      return 9100;
-    }
+  async getConsolePortNumber(returnDefault?: boolean) {
+    return new Promise((resolve, reject) => {
+      if (this.consolePortNumber) {
+        return resolve(this.consolePortNumber);
+      }
+      let ports =
+        this.callerInstance.callerPlugin.gluePluginStore.get("console_ports") ||
+        [];
+      DockerodeHelper.getPort(9160, ports)
+        .then((port: number) => {
+          this.setConsolePortNumber(port);
+          ports.push(port);
+          this.callerInstance.callerPlugin.gluePluginStore.set(
+            "console_ports",
+            ports,
+          );
+          return resolve(this.consolePortNumber);
+        })
+        .catch((e: any) => {
+          reject(e);
+        });
+    });
   }
 
   getContainerId(): string {
@@ -158,86 +185,52 @@ export class PluginInstanceContainerController
   getConfig(): any {}
 
   async up() {
-    let ports =
-      this.callerInstance.callerPlugin.gluePluginStore.get("ports") || [];
-
-    let consolePorts =
-      this.callerInstance.callerPlugin.gluePluginStore.get("console_ports") ||
-      [];
-
     await new Promise(async (resolve, reject) => {
-      DockerodeHelper.getPort(this.getPortNumber(true), ports)
-        .then(async (port: number) => {
-          DockerodeHelper.getPort(this.getConsolePortNumber(true), consolePorts)
-            .then(async (consolePort: number) => {
-              this.portNumber = port;
-              this.consolePortNumber = consolePort;
-              DockerodeHelper.up(
-                this.getDockerJson(),
-                this.getEnv(),
-                this.portNumber,
-                this.callerInstance.getName(),
-              )
-                .then(
-                  ({
-                    status,
-                    portNumber,
-                    containerId,
-                  }: {
-                    status: "up" | "down";
-                    portNumber: number;
-                    containerId: string;
-                  }) => {
-                    this.setStatus(status);
-                    this.setPortNumber(portNumber);
-                    this.setConsolePortNumber(consolePort);
-                    this.setContainerId(containerId);
-                    ports.push(portNumber);
-                    consolePorts.push(consolePort);
-                    this.callerInstance.callerPlugin.gluePluginStore.set(
-                      "ports",
-                      ports,
-                    );
-                    this.callerInstance.callerPlugin.gluePluginStore.set(
-                      "console_ports",
-                      consolePorts,
-                    );
-                    console.log("\x1b[32m");
-                    console.log(
-                      `API: http://localhost:${this.getPortNumber()}`,
-                    );
-                    console.log(
-                      `Console: http://localhost:${this.getConsolePortNumber()}/ open in browser`,
-                    );
-                    console.log("\x1b[0m");
-                    console.log("\x1b[36m");
-                    console.log(`Credentials to login in minio console: `);
-                    console.log(`username: ${this.getEnv().MINIO_ACCESS_KEY}`);
-                    console.log(`password: ${this.getEnv().MINIO_SECRET_KEY}`);
-                    console.log("\x1b[0m");
-                    console.log(`Env for using minio API: `);
-                    console.log(constructEnv(this.getEnv()));
+      DockerodeHelper.up(
+        await this.getDockerJson(),
+        await this.getEnv(),
+        await this.getPortNumber(),
+        this.callerInstance.getName(),
+      )
+        .then(
+          async ({
+            status,
+            containerId,
+          }: {
+            status: "up" | "down";
+            containerId: string;
+          }) => {
+            this.setStatus(status);
+            this.setContainerId(containerId);
+            console.log("\x1b[32m");
+            console.log(`API: http://localhost:${await this.getPortNumber()}`);
+            console.log(
+              `Console: http://localhost:${await this.getConsolePortNumber()}/ open in browser`,
+            );
+            console.log("\x1b[0m");
+            console.log("\x1b[36m");
+            console.log(`Credentials to login in minio console: `);
+            console.log(`username: ${(await this.getEnv()).MINIO_ACCESS_KEY}`);
+            console.log(`password: ${(await this.getEnv()).MINIO_SECRET_KEY}`);
+            console.log("\x1b[0m");
+            console.log(`Env for using minio API: `);
+            console.log(constructEnv(await this.getEnv()));
 
-                    createBucket(this)
-                      .then(() => {
-                        return resolve(true);
-                      })
-                      .catch(() => {
-                        console.log("\x1b[33m");
-                        console.log(
-                          `Could not create public bucket, please create one manually`,
-                        );
-                        console.log("\x1b[0m");
-                      });
-                  },
-                )
-                .catch((e: any) => {
-                  return reject(e);
-                });
-            })
-            .catch((e: any) => {
-              return reject(e);
-            });
+            createBucket(this)
+              .then(() => {
+                return resolve(true);
+              })
+              .catch(() => {
+                console.log("\x1b[33m");
+                console.log(
+                  `Could not create public bucket, please create one manually`,
+                );
+                console.log("\x1b[0m");
+              });
+          },
+        )
+        .catch((e: any) => {
+          return reject(e);
         })
         .catch((e: any) => {
           return reject(e);
@@ -246,32 +239,10 @@ export class PluginInstanceContainerController
   }
 
   async down() {
-    let ports =
-      this.callerInstance.callerPlugin.gluePluginStore.get("ports") || [];
-    let consolePorts =
-      this.callerInstance.callerPlugin.gluePluginStore.get("console_ports") ||
-      [];
     await new Promise(async (resolve, reject) => {
       DockerodeHelper.down(this.getContainerId(), this.callerInstance.getName())
         .then(() => {
           this.setStatus("down");
-          var index = ports.indexOf(this.getPortNumber());
-          if (index !== -1) {
-            ports.splice(index, 1);
-          }
-          this.callerInstance.callerPlugin.gluePluginStore.set("ports", ports);
-
-          var consoleIndex = consolePorts.indexOf(this.getConsolePortNumber());
-          if (consoleIndex !== -1) {
-            consolePorts.splice(consoleIndex, 1);
-          }
-          this.callerInstance.callerPlugin.gluePluginStore.set(
-            "console_ports",
-            consolePorts,
-          );
-
-          this.setPortNumber(null);
-          this.setConsolePortNumber(null);
           this.setContainerId(null);
           return resolve(true);
         })
