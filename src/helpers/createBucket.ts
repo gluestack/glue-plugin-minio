@@ -5,7 +5,7 @@ async function getMinioClient(
   containerController: PluginInstanceContainerController,
 ) {
   return new Minio.Client({
-    endPoint: (await containerController.getEnv()).MINIO_END_POINT,
+    endPoint: "127.0.0.1",
     port: (await containerController.getEnv()).MINIO_PORT,
     useSSL: (await containerController.getEnv()).MINIO_USE_SSL,
     accessKey: (await containerController.getEnv()).MINIO_ACCESS_KEY,

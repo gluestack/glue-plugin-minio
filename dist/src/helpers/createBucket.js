@@ -46,21 +46,20 @@ function getMinioClient(containerController) {
             switch (_d.label) {
                 case 0:
                     _b = (_a = Minio.Client).bind;
-                    _c = {};
+                    _c = {
+                        endPoint: "127.0.0.1"
+                    };
                     return [4, containerController.getEnv()];
                 case 1:
-                    _c.endPoint = (_d.sent()).MINIO_END_POINT;
-                    return [4, containerController.getEnv()];
-                case 2:
                     _c.port = (_d.sent()).MINIO_PORT;
                     return [4, containerController.getEnv()];
-                case 3:
+                case 2:
                     _c.useSSL = (_d.sent()).MINIO_USE_SSL;
                     return [4, containerController.getEnv()];
-                case 4:
+                case 3:
                     _c.accessKey = (_d.sent()).MINIO_ACCESS_KEY;
                     return [4, containerController.getEnv()];
-                case 5: return [2, new (_b.apply(_a, [void 0, (_c.secretKey = (_d.sent()).MINIO_SECRET_KEY,
+                case 4: return [2, new (_b.apply(_a, [void 0, (_c.secretKey = (_d.sent()).MINIO_SECRET_KEY,
                             _c)]))()];
             }
         });
