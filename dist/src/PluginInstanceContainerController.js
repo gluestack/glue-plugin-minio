@@ -74,7 +74,7 @@ var PluginInstanceContainerController = (function () {
                         minio_credentials =
                             this.callerInstance.gluePluginStore.get("minio_credentials");
                         _a = {
-                            MINIO_END_POINT: "127.0.0.1"
+                            MINIO_END_POINT: "host.docker.internal"
                         };
                         return [4, this.getPortNumber()];
                     case 1: return [2, (_a.MINIO_PORT = _b.sent(),

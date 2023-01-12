@@ -76,10 +76,12 @@ var GlueStackPlugin = (function () {
                     case 0: return [4, this.app.createPluginInstance(this, instanceName, this.getTemplateFolderPath(), target)];
                     case 1:
                         instance = _a.sent();
+                        if (!instance) return [3, 3];
                         return [4, instance.getContainerController().up()];
                     case 2:
                         _a.sent();
-                        return [2];
+                        _a.label = 3;
+                    case 3: return [2];
                 }
             });
         });
