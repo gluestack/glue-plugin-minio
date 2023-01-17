@@ -1,6 +1,6 @@
 {
     "name": "@gluestack/glue-plugin-minio",
-    "version": "0.0.10",
+    "version": "0.0.11",
     "description": "minio devonly plugin for gluestack framework",
     "repository": {
         "type": "git",
@@ -13,7 +13,7 @@
     "author": "Syed Yaseen",
     "license": "ISC",
     "dependencies": {
-        "@gluestack/helpers": "^0.0.7",
+        "@gluestack/helpers": "^0.0.x",
         "@types/node": "^18.11.17",
         "minio": "^7.0.32"
     },
@@ -23,10 +23,10 @@
         "plugin-build": "tsc"
     },
     "devDependencies": {
-        "@gluestack/helpers": "^0.0.7",
+        "@gluestack/helpers": "^0.0.x",
         "typescript": "^4.9.4"
     },
     "peerDependencies": {
-        "@gluestack/framework": "^0.0.16"
+        "@gluestack/framework": "^0.0.x"
     }
 }
