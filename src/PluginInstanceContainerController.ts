@@ -16,7 +16,8 @@ export class PluginInstanceContainerController
   containerId: string;
   dockerfile: string;
   callerInstance: IInstance;
-  bucketName: string = "public";
+  publicBucketName: string = "public";
+  privateBucketName: string = "private";
 
   constructor(app: IApp, callerInstance: IInstance) {
     this.app = app;
@@ -31,12 +32,24 @@ export class PluginInstanceContainerController
     );
   }
 
-  getBucketName(): string {
-    return this.bucketName;
+  getPublicBucketName(): string {
+    return this.publicBucketName;
+  }
+
+  getPrivateBucketName(): string {
+    return this.privateBucketName;
   }
 
   getCallerInstance(): IInstance {
     return this.callerInstance;
+  }
+
+  getAdminEndPoint(): string {
+    return "host.docker.internal"
+  }
+
+  getCdnEndPoint(): string {
+    return "127.0.0.1"
   }
 
   async getEnv() {
@@ -58,12 +71,14 @@ export class PluginInstanceContainerController
       this.callerInstance.gluePluginStore.get("minio_credentials");
 
     return {
-      MINIO_END_POINT: "host.docker.internal",
+      MINIO_ADMIN_END_POINT: this.getAdminEndPoint(),
+      MINIO_CDN_END_POINT: this.getCdnEndPoint(),
       MINIO_PORT: await this.getPortNumber(),
       MINIO_USE_SSL: false,
       MINIO_ACCESS_KEY: minio_credentials.username,
       MINIO_SECRET_KEY: minio_credentials.password,
-      MINIO_BUCKET: this.getBucketName(),
+      MINIO_PUBLIC_BUCKET: this.getPublicBucketName(),
+      MINIO_PRIVATE_BUCKET: this.getPrivateBucketName(),
     };
   }
 
@@ -207,14 +222,11 @@ export class PluginInstanceContainerController
             console.log(
               `Console: http://localhost:${await this.getConsolePortNumber()}/ open in browser`,
             );
-            console.log("\x1b[0m");
-            console.log("\x1b[36m");
+            console.log("\x1b[0m", "\x1b[36m");
             console.log(`Credentials to login in minio console: `);
             console.log(`username: ${(await this.getEnv()).MINIO_ACCESS_KEY}`);
             console.log(`password: ${(await this.getEnv()).MINIO_SECRET_KEY}`);
             console.log("\x1b[0m");
-            console.log(`Env for using minio API: `);
-            console.log(constructEnv(await this.getEnv()));
 
             createBucket(this)
               .then(() => {
@@ -223,7 +235,7 @@ export class PluginInstanceContainerController
               .catch(() => {
                 console.log("\x1b[33m");
                 console.log(
-                  `Could not create public bucket, please create one manually`,
+                  `Could not create buckets, please create public and private buckets manually`,
                 );
                 console.log("\x1b[0m");
               });

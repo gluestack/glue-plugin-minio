@@ -38,12 +38,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.PluginInstanceContainerController = void 0;
 var DockerodeHelper = require("@gluestack/helpers").DockerodeHelper;
-var constructEnv_1 = require("./helpers/constructEnv");
 var createBucket_1 = require("./helpers/createBucket");
 var PluginInstanceContainerController = (function () {
     function PluginInstanceContainerController(app, callerInstance) {
         this.status = "down";
-        this.bucketName = "public";
+        this.publicBucketName = "public";
+        this.privateBucketName = "private";
         this.app = app;
         this.callerInstance = callerInstance;
         this.setStatus(this.callerInstance.gluePluginStore.get("status"));
@@ -51,11 +51,20 @@ var PluginInstanceContainerController = (function () {
         this.setConsolePortNumber(this.callerInstance.gluePluginStore.get("console_port_number"));
         this.setContainerId(this.callerInstance.gluePluginStore.get("container_id"));
     }
-    PluginInstanceContainerController.prototype.getBucketName = function () {
-        return this.bucketName;
+    PluginInstanceContainerController.prototype.getPublicBucketName = function () {
+        return this.publicBucketName;
+    };
+    PluginInstanceContainerController.prototype.getPrivateBucketName = function () {
+        return this.privateBucketName;
     };
     PluginInstanceContainerController.prototype.getCallerInstance = function () {
         return this.callerInstance;
+    };
+    PluginInstanceContainerController.prototype.getAdminEndPoint = function () {
+        return "host.docker.internal";
+    };
+    PluginInstanceContainerController.prototype.getCdnEndPoint = function () {
+        return "127.0.0.1";
     };
     PluginInstanceContainerController.prototype.getEnv = function () {
         return __awaiter(this, void 0, void 0, function () {
@@ -74,14 +83,16 @@ var PluginInstanceContainerController = (function () {
                         minio_credentials =
                             this.callerInstance.gluePluginStore.get("minio_credentials");
                         _a = {
-                            MINIO_END_POINT: "host.docker.internal"
+                            MINIO_ADMIN_END_POINT: this.getAdminEndPoint(),
+                            MINIO_CDN_END_POINT: this.getCdnEndPoint()
                         };
                         return [4, this.getPortNumber()];
                     case 1: return [2, (_a.MINIO_PORT = _b.sent(),
                             _a.MINIO_USE_SSL = false,
                             _a.MINIO_ACCESS_KEY = minio_credentials.username,
                             _a.MINIO_SECRET_KEY = minio_credentials.password,
-                            _a.MINIO_BUCKET = this.getBucketName(),
+                            _a.MINIO_PUBLIC_BUCKET = this.getPublicBucketName(),
+                            _a.MINIO_PRIVATE_BUCKET = this.getPrivateBucketName(),
                             _a)];
                 }
             });
@@ -226,9 +237,9 @@ var PluginInstanceContainerController = (function () {
                                             .then(function (_a) {
                                             var status = _a.status, containerId = _a.containerId;
                                             return __awaiter(_this, void 0, void 0, function () {
-                                                var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
-                                                return __generator(this, function (_s) {
-                                                    switch (_s.label) {
+                                                var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+                                                return __generator(this, function (_p) {
+                                                    switch (_p.label) {
                                                         case 0:
                                                             this.setStatus(status);
                                                             this.setContainerId(containerId);
@@ -237,38 +248,31 @@ var PluginInstanceContainerController = (function () {
                                                             _d = "API: http://localhost:".concat;
                                                             return [4, this.getPortNumber()];
                                                         case 1:
-                                                            _c.apply(_b, [_d.apply("API: http://localhost:", [_s.sent()])]);
+                                                            _c.apply(_b, [_d.apply("API: http://localhost:", [_p.sent()])]);
                                                             _f = (_e = console).log;
                                                             _g = "Console: http://localhost:".concat;
                                                             return [4, this.getConsolePortNumber()];
                                                         case 2:
-                                                            _f.apply(_e, [_g.apply("Console: http://localhost:", [_s.sent(), "/ open in browser"])]);
-                                                            console.log("\x1b[0m");
-                                                            console.log("\x1b[36m");
+                                                            _f.apply(_e, [_g.apply("Console: http://localhost:", [_p.sent(), "/ open in browser"])]);
+                                                            console.log("\x1b[0m", "\x1b[36m");
                                                             console.log("Credentials to login in minio console: ");
                                                             _j = (_h = console).log;
                                                             _k = "username: ".concat;
                                                             return [4, this.getEnv()];
                                                         case 3:
-                                                            _j.apply(_h, [_k.apply("username: ", [(_s.sent()).MINIO_ACCESS_KEY])]);
+                                                            _j.apply(_h, [_k.apply("username: ", [(_p.sent()).MINIO_ACCESS_KEY])]);
                                                             _m = (_l = console).log;
                                                             _o = "password: ".concat;
                                                             return [4, this.getEnv()];
                                                         case 4:
-                                                            _m.apply(_l, [_o.apply("password: ", [(_s.sent()).MINIO_SECRET_KEY])]);
+                                                            _m.apply(_l, [_o.apply("password: ", [(_p.sent()).MINIO_SECRET_KEY])]);
                                                             console.log("\x1b[0m");
-                                                            console.log("Env for using minio API: ");
-                                                            _q = (_p = console).log;
-                                                            _r = constructEnv_1.constructEnv;
-                                                            return [4, this.getEnv()];
-                                                        case 5:
-                                                            _q.apply(_p, [_r.apply(void 0, [_s.sent()])]);
                                                             (0, createBucket_1.createBucket)(this)
                                                                 .then(function () {
                                                                 return resolve(true);
                                                             })["catch"](function () {
                                                                 console.log("\x1b[33m");
-                                                                console.log("Could not create public bucket, please create one manually");
+                                                                console.log("Could not create buckets, please create public and private buckets manually");
                                                                 console.log("\x1b[0m");
                                                             });
                                                             return [2];

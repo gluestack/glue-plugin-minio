@@ -40,105 +40,60 @@ exports.createBucket = void 0;
 var Minio = require("minio");
 function getMinioClient(containerController) {
     return __awaiter(this, void 0, void 0, function () {
-        var _a, _b;
-        var _c;
-        return __generator(this, function (_d) {
-            switch (_d.label) {
-                case 0:
-                    _b = (_a = Minio.Client).bind;
-                    _c = {
-                        endPoint: "127.0.0.1"
-                    };
-                    return [4, containerController.getEnv()];
+        var env;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4, containerController.getEnv()];
                 case 1:
-                    _c.port = (_d.sent()).MINIO_PORT;
-                    return [4, containerController.getEnv()];
-                case 2:
-                    _c.useSSL = (_d.sent()).MINIO_USE_SSL;
-                    return [4, containerController.getEnv()];
-                case 3:
-                    _c.accessKey = (_d.sent()).MINIO_ACCESS_KEY;
-                    return [4, containerController.getEnv()];
-                case 4: return [2, new (_b.apply(_a, [void 0, (_c.secretKey = (_d.sent()).MINIO_SECRET_KEY,
-                            _c)]))()];
+                    env = _a.sent();
+                    return [2, new Minio.Client({
+                            endPoint: env.MINIO_CDN_END_POINT,
+                            port: env.MINIO_PORT,
+                            useSSL: env.MINIO_USE_SSL,
+                            accessKey: env.MINIO_ACCESS_KEY,
+                            secretKey: env.MINIO_SECRET_KEY
+                        })];
             }
         });
     });
 }
-function tryCreateBucket(containerController) {
+function tryCreateBucket(containerController, bucket) {
     return __awaiter(this, void 0, void 0, function () {
+        var env;
         var _this = this;
         return __generator(this, function (_a) {
-            return [2, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                    var minioClient, _a, _b;
-                    return __generator(this, function (_c) {
-                        switch (_c.label) {
-                            case 0: return [4, getMinioClient(containerController)];
-                            case 1:
-                                minioClient = _c.sent();
-                                _b = (_a = minioClient).bucketExists;
-                                return [4, containerController.getEnv()];
-                            case 2:
-                                _b.apply(_a, [(_c.sent()).MINIO_BUCKET,
-                                    function (err, exists) {
-                                        return __awaiter(this, void 0, void 0, function () {
-                                            var _a, _b;
-                                            return __generator(this, function (_c) {
-                                                switch (_c.label) {
-                                                    case 0:
-                                                        if (exists)
-                                                            return [2, resolve(true)];
+            switch (_a.label) {
+                case 0: return [4, containerController.getEnv()];
+                case 1:
+                    env = _a.sent();
+                    return [2, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                            var minioClient;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4, getMinioClient(containerController)];
+                                    case 1:
+                                        minioClient = _a.sent();
+                                        minioClient.bucketExists(env[bucket], function (err, exists) {
+                                            return __awaiter(this, void 0, void 0, function () {
+                                                return __generator(this, function (_a) {
+                                                    if (exists)
+                                                        return [2, resolve(true)];
+                                                    if (err)
+                                                        return [2, reject(err)];
+                                                    minioClient.makeBucket(env[bucket], "us-east-1", function (err) {
                                                         if (err)
-                                                            return [2, reject(err)];
-                                                        _b = (_a = minioClient).makeBucket;
-                                                        return [4, containerController.getEnv()];
-                                                    case 1:
-                                                        _b.apply(_a, [(_c.sent()).MINIO_BUCKET,
-                                                            "us-east-1",
-                                                            function (err) {
-                                                                if (err)
-                                                                    return reject(err);
-                                                                minioClient.setBucketPolicy("my-bucketname", JSON.stringify({
-                                                                    Version: "2012-10-17",
-                                                                    Statement: [
-                                                                        {
-                                                                            Effect: "Allow",
-                                                                            Principal: { AWS: ["*"] },
-                                                                            Action: [
-                                                                                "s3:GetBucketLocation",
-                                                                                "s3:ListBucket",
-                                                                                "s3:ListBucketMultipartUploads",
-                                                                            ],
-                                                                            Resource: ["arn:aws:s3:::public"]
-                                                                        },
-                                                                        {
-                                                                            Effect: "Allow",
-                                                                            Principal: { AWS: ["*"] },
-                                                                            Action: [
-                                                                                "s3:DeleteObject",
-                                                                                "s3:GetObject",
-                                                                                "s3:ListMultipartUploadParts",
-                                                                                "s3:PutObject",
-                                                                                "s3:AbortMultipartUpload",
-                                                                            ],
-                                                                            Resource: ["arn:aws:s3:::public/*"]
-                                                                        },
-                                                                    ]
-                                                                }), function (err) {
-                                                                    if (err)
-                                                                        return reject(err);
-                                                                    return resolve(true);
-                                                                });
-                                                            }]);
-                                                        return [2];
-                                                }
+                                                            return reject(err);
+                                                        return resolve(true);
+                                                    });
+                                                    return [2];
+                                                });
                                             });
                                         });
-                                    }]);
-                                return [2];
-                        }
-                    });
-                }); })];
+                                        return [2];
+                                }
+                            });
+                        }); })];
+            }
         });
     });
 }
@@ -149,24 +104,28 @@ function createBucket(containerController) {
         return __generator(this, function (_a) {
             count = 0;
             return [2, new Promise(function (resolve, reject) {
-                    var interval = setInterval(function () { return __awaiter(_this, void 0, void 0, function () {
-                        return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0: return [4, tryCreateBucket(containerController)
-                                        .then(function (res) {
-                                        clearInterval(interval);
-                                        return resolve(true);
-                                    })["catch"](function (e) { })];
-                                case 1:
-                                    _a.sent();
-                                    if (count > 10) {
-                                        return [2, reject("Bucket not created")];
-                                    }
-                                    ++count;
-                                    return [2];
-                            }
-                        });
-                    }); }, 5000);
+                    ["MINIO_PUBLIC_BUCKET", "MINIO_PRIVATE_BUCKET"].map(function (bucket) {
+                        var interval = setInterval(function () { return __awaiter(_this, void 0, void 0, function () {
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4, tryCreateBucket(containerController, bucket)
+                                            .then(function (res) {
+                                            clearInterval(interval);
+                                            return resolve(true);
+                                        })["catch"](function (e) {
+                                            console.log("Bucket not created", count, e.message);
+                                        })];
+                                    case 1:
+                                        _a.sent();
+                                        if (count > 10) {
+                                            return [2, reject("Bucket not created")];
+                                        }
+                                        ++count;
+                                        return [2];
+                                }
+                            });
+                        }); }, 5000);
+                    });
                 })];
         });
     });
