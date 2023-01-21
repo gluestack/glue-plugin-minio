@@ -13,21 +13,21 @@ import { Canvas, Meta, Story } from "@storybook/addon-docs";
   
   <br/>
   
-  * Minio plugin instance will be running on our **Docker** as a seperate container.
+  * Minio plugin instance will be running on your **Docker** as a seperate container.
   
   
   <br/>
   
   
   
-  * Behind the scene what happens is, our docker file of minio is created and it is included
-  the main docker-compose file of our app which starts running our **minio** container
+  * Behind the scene what happens is, your docker file of minio is created and it is included
+  the main docker-compose file of your app which starts running your **minio** container
   
   
   <br/>
   
   
-  * Our directory stucture for the **minio plugin instance** will be something
+  * Your directory stucture for the **minio plugin instance** should be something
     like this:
     <br/>
 
@@ -77,12 +77,12 @@ import { Canvas, Meta, Story } from "@storybook/addon-docs";
   <br/>
   <br/>
   
-  * In order to upload files to **minio** server we need to install another plugin named
+  * In order to upload files to **minio** server you need to install another plugin named
   **glue-plugin-storage** which uses minio, to upload files and store them.
   
   <br/>
   
-  * In order to start this plugin we need to run the following command:
+  * In order to start this plugin you need to run the following command:
     
     <br/>
   
@@ -102,15 +102,15 @@ import { Canvas, Meta, Story } from "@storybook/addon-docs";
   
   <br/>
   
-  * In order to interact with our **minio** server to upload and store files,
-  we can use another plugin named **glue-plugin-storage** which already comes
-  with configuration with our minio server and we can start using that plugin
+  * In order to interact with your **minio** server to upload and store files,
+  you can use another plugin named **glue-plugin-storage** which already comes
+  with configuration with your minio server and you can start using that plugin
   to our app.
 
   <br/>
 
   * If you want to interact with the minio server by yourself then you can simply
-  pick up the **configuration information** provided in the console when we have
+  pick up the **configuration information** provided in the console when you have
   installed the **minio plugin**.
 
 
