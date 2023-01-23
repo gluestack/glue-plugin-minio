@@ -83,7 +83,42 @@ function tryCreateBucket(containerController, bucket) {
                                                     minioClient.makeBucket(env[bucket], "us-east-1", function (err) {
                                                         if (err)
                                                             return reject(err);
-                                                        return resolve(true);
+                                                        if (bucket === "MINIO_PUBLIC_BUCKET") {
+                                                            minioClient.setBucketPolicy(env[bucket], JSON.stringify({
+                                                                Version: "2012-10-17",
+                                                                Statement: [
+                                                                    {
+                                                                        Effect: "Allow",
+                                                                        Principal: { AWS: ["*"] },
+                                                                        Action: [
+                                                                            "s3:GetBucketLocation",
+                                                                            "s3:ListBucket",
+                                                                            "s3:ListBucketMultipartUploads",
+                                                                        ],
+                                                                        Resource: ["arn:aws:s3:::public"]
+                                                                    },
+                                                                    {
+                                                                        Effect: "Allow",
+                                                                        Principal: { AWS: ["*"] },
+                                                                        Action: [
+                                                                            "s3:DeleteObject",
+                                                                            "s3:GetObject",
+                                                                            "s3:ListMultipartUploadParts",
+                                                                            "s3:PutObject",
+                                                                            "s3:AbortMultipartUpload",
+                                                                        ],
+                                                                        Resource: ["arn:aws:s3:::public/*"]
+                                                                    },
+                                                                ]
+                                                            }), function (err) {
+                                                                if (err)
+                                                                    return reject(err);
+                                                                return resolve(true);
+                                                            });
+                                                        }
+                                                        else {
+                                                            return resolve(true);
+                                                        }
                                                     });
                                                     return [2];
                                                 });
