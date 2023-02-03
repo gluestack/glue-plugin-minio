@@ -39,6 +39,7 @@ exports.__esModule = true;
 exports.PluginInstanceContainerController = void 0;
 var DockerodeHelper = require("@gluestack/helpers").DockerodeHelper;
 var createBucket_1 = require("./helpers/createBucket");
+var minioConfig_1 = require("./commands/minioConfig");
 var PluginInstanceContainerController = (function () {
     function PluginInstanceContainerController(app, callerInstance) {
         this.status = "down";
@@ -69,32 +70,23 @@ var PluginInstanceContainerController = (function () {
     PluginInstanceContainerController.prototype.getEnv = function () {
         return __awaiter(this, void 0, void 0, function () {
             var minio_credentials;
-            var _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        minio_credentials = {
-                            username: "gluestack",
-                            password: "password"
-                        };
-                        if (!this.callerInstance.gluePluginStore.get("minio_credentials") ||
-                            !this.callerInstance.gluePluginStore.get("minio_credentials").username)
-                            this.callerInstance.gluePluginStore.set("minio_credentials", minio_credentials);
-                        minio_credentials =
-                            this.callerInstance.gluePluginStore.get("minio_credentials");
-                        _a = {
-                            MINIO_ADMIN_END_POINT: this.getAdminEndPoint(),
-                            MINIO_CDN_END_POINT: this.getCdnEndPoint()
-                        };
-                        return [4, this.getPortNumber()];
-                    case 1: return [2, (_a.MINIO_PORT = _b.sent(),
-                            _a.MINIO_USE_SSL = false,
-                            _a.MINIO_ACCESS_KEY = minio_credentials.username,
-                            _a.MINIO_SECRET_KEY = minio_credentials.password,
-                            _a.MINIO_PUBLIC_BUCKET = this.getPublicBucketName(),
-                            _a.MINIO_PRIVATE_BUCKET = this.getPrivateBucketName(),
-                            _a)];
-                }
+            return __generator(this, function (_a) {
+                minio_credentials = minioConfig_1.defaultConfig;
+                if (!this.callerInstance.gluePluginStore.get("minio_credentials") ||
+                    !this.callerInstance.gluePluginStore.get("minio_credentials").username)
+                    this.callerInstance.gluePluginStore.set("minio_credentials", minio_credentials);
+                minio_credentials =
+                    this.callerInstance.gluePluginStore.get("minio_credentials");
+                return [2, {
+                        MINIO_ADMIN_END_POINT: minio_credentials.admin_end_point,
+                        MINIO_CDN_END_POINT: minio_credentials.cdn_end_point,
+                        MINIO_PORT: parseInt(minio_credentials.port),
+                        MINIO_USE_SSL: false,
+                        MINIO_ACCESS_KEY: minio_credentials.username,
+                        MINIO_SECRET_KEY: minio_credentials.password,
+                        MINIO_PUBLIC_BUCKET: this.getPublicBucketName(),
+                        MINIO_PRIVATE_BUCKET: this.getPrivateBucketName()
+                    }];
             });
         });
     };

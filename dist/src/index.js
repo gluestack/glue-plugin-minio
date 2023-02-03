@@ -42,6 +42,7 @@ exports.__esModule = true;
 exports.GlueStackPlugin = void 0;
 var package_json_1 = __importDefault(require("../package.json"));
 var PluginInstance_1 = require("./PluginInstance");
+var minioConfig_1 = require("./commands/minioConfig");
 var GlueStackPlugin = (function () {
     function GlueStackPlugin(app, gluePluginStore) {
         this.type = "devonly";
@@ -76,12 +77,15 @@ var GlueStackPlugin = (function () {
                     case 0: return [4, this.app.createPluginInstance(this, instanceName, this.getTemplateFolderPath(), target)];
                     case 1:
                         instance = _a.sent();
-                        if (!instance) return [3, 3];
-                        return [4, instance.getContainerController().up()];
+                        if (!instance) return [3, 4];
+                        return [4, (0, minioConfig_1.writeInstance)(instance)];
                     case 2:
                         _a.sent();
-                        _a.label = 3;
-                    case 3: return [2];
+                        return [4, instance.getContainerController().up()];
+                    case 3:
+                        _a.sent();
+                        _a.label = 4;
+                    case 4: return [2];
                 }
             });
         });

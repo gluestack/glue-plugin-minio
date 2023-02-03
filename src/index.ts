@@ -7,6 +7,7 @@ import IInstance from "@gluestack/framework/types/plugin/interface/IInstance";
 import ILifeCycle from "@gluestack/framework/types/plugin/interface/ILifeCycle";
 import IManagesInstances from "@gluestack/framework/types/plugin/interface/IManagesInstances";
 import IGlueStorePlugin from "@gluestack/framework/types/store/interface/IGluePluginStore";
+import { writeInstance } from "./commands/minioConfig";
 
 //Do not edit the name of this class
 export class GlueStackPlugin implements IPlugin, IManagesInstances, ILifeCycle {
@@ -56,7 +57,10 @@ export class GlueStackPlugin implements IPlugin, IManagesInstances, ILifeCycle {
       this.getTemplateFolderPath(),
       target,
     );
-    if (instance) await instance.getContainerController().up();
+    if (instance) {
+      await writeInstance(instance);
+      await instance.getContainerController().up();
+    }
   }
 
   createInstance(

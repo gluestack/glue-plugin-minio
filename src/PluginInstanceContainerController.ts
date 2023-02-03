@@ -5,10 +5,10 @@ import IContainerController from "@gluestack/framework/types/plugin/interface/IC
 import { IMinio } from "./interfaces/IMinio";
 import { constructEnv } from "./helpers/constructEnv";
 import { createBucket } from "./helpers/createBucket";
+import { defaultConfig } from "./commands/minioConfig";
 
 export class PluginInstanceContainerController
-  implements IContainerController, IMinio
-{
+  implements IContainerController, IMinio {
   app: IApp;
   status: "up" | "down" = "down";
   portNumber: number;
@@ -53,10 +53,7 @@ export class PluginInstanceContainerController
   }
 
   async getEnv() {
-    let minio_credentials = {
-      username: "gluestack",
-      password: "password",
-    };
+    let minio_credentials = defaultConfig;
 
     if (
       !this.callerInstance.gluePluginStore.get("minio_credentials") ||
@@ -71,9 +68,9 @@ export class PluginInstanceContainerController
       this.callerInstance.gluePluginStore.get("minio_credentials");
 
     return {
-      MINIO_ADMIN_END_POINT: this.getAdminEndPoint(),
-      MINIO_CDN_END_POINT: this.getCdnEndPoint(),
-      MINIO_PORT: await this.getPortNumber(),
+      MINIO_ADMIN_END_POINT: minio_credentials.admin_end_point,
+      MINIO_CDN_END_POINT: minio_credentials.cdn_end_point,
+      MINIO_PORT: parseInt(minio_credentials.port),
       MINIO_USE_SSL: false,
       MINIO_ACCESS_KEY: minio_credentials.username,
       MINIO_SECRET_KEY: minio_credentials.password,
@@ -99,9 +96,8 @@ export class PluginInstanceContainerController
           ],
         },
         Binds: [
-          `${
-            process.cwd() +
-            this.callerInstance.getInstallationPath().substring(1)
+          `${process.cwd() +
+          this.callerInstance.getInstallationPath().substring(1)
           }/data:/data`,
         ],
       },
@@ -197,7 +193,7 @@ export class PluginInstanceContainerController
     return (this.dockerfile = dockerfile || null);
   }
 
-  getConfig(): any {}
+  getConfig(): any { }
 
   async up() {
     await new Promise(async (resolve, reject) => {
@@ -264,5 +260,5 @@ export class PluginInstanceContainerController
     });
   }
 
-  async build() {}
+  async build() { }
 }
