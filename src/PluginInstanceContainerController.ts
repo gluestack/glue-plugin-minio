@@ -197,6 +197,10 @@ export class PluginInstanceContainerController
 
   async up() {
     await new Promise(async (resolve, reject) => {
+      if (this.callerInstance.gluePluginStore.get("minio_credentials")?.external) {
+        return resolve(true);
+      }
+
       DockerodeHelper.up(
         await this.getDockerJson(),
         await this.getEnv(),

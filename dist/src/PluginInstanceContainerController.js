@@ -213,19 +213,23 @@ var PluginInstanceContainerController = (function () {
                     case 0: return [4, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
                             var _a, _b, _c;
                             var _this = this;
-                            return __generator(this, function (_d) {
-                                switch (_d.label) {
+                            var _d;
+                            return __generator(this, function (_e) {
+                                switch (_e.label) {
                                     case 0:
+                                        if ((_d = this.callerInstance.gluePluginStore.get("minio_credentials")) === null || _d === void 0 ? void 0 : _d.external) {
+                                            return [2, resolve(true)];
+                                        }
                                         _b = (_a = DockerodeHelper).up;
                                         return [4, this.getDockerJson()];
                                     case 1:
-                                        _c = [_d.sent()];
+                                        _c = [_e.sent()];
                                         return [4, this.getEnv()];
                                     case 2:
-                                        _c = _c.concat([_d.sent()]);
+                                        _c = _c.concat([_e.sent()]);
                                         return [4, this.getPortNumber()];
                                     case 3:
-                                        _b.apply(_a, _c.concat([_d.sent(), this.callerInstance.getName()]))
+                                        _b.apply(_a, _c.concat([_e.sent(), this.callerInstance.getName()]))
                                             .then(function (_a) {
                                             var status = _a.status, containerId = _a.containerId;
                                             return __awaiter(_this, void 0, void 0, function () {
