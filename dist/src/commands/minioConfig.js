@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -39,6 +50,7 @@ exports.__esModule = true;
 exports.writeInstance = exports.defaultConfig = void 0;
 var prompts = require("prompts");
 exports.defaultConfig = {
+    external: false,
     username: "gluestack",
     password: "password",
     admin_end_point: "host.docker.internal",
@@ -49,36 +61,40 @@ var getNewInstanceQuestions = function (oldConfig) {
     return [
         {
             type: 'confirm',
-            name: "choice",
+            name: "external",
             message: "Do you want to use external minio?",
             initial: false
         },
         {
-            type: function (prev) { return (prev === true ? 'text' : null); },
+            type: 'text',
             name: "username",
             message: "What is your minio username?",
             initial: (oldConfig === null || oldConfig === void 0 ? void 0 : oldConfig.username) || exports.defaultConfig.username
         },
         {
-            type: function (prev) { return (prev ? 'text' : null); },
+            type: 'text',
             name: "password",
             message: "What is your minio password?",
             initial: (oldConfig === null || oldConfig === void 0 ? void 0 : oldConfig.password) || exports.defaultConfig.password
-        },
+        }
+    ];
+};
+var getExternalInstanceQuestions = function (oldConfig) {
+    return [
         {
-            type: function (prev) { return (prev ? 'text' : null); },
+            type: 'text',
             name: "admin_end_point",
             message: "What is your minio admin-end-point?",
             initial: (oldConfig === null || oldConfig === void 0 ? void 0 : oldConfig.admin_end_point) || exports.defaultConfig.admin_end_point
         },
         {
-            type: function (prev) { return (prev ? 'text' : null); },
+            type: 'text',
             name: "cdn_end_point",
             message: "What is your minio cdn-end-point?",
             initial: (oldConfig === null || oldConfig === void 0 ? void 0 : oldConfig.cdn_end_point) || exports.defaultConfig.cdn_end_point
         },
         {
-            type: function (prev) { return (prev ? 'text' : null); },
+            type: 'text',
             name: "port",
             message: "What is your minio port?",
             initial: (oldConfig === null || oldConfig === void 0 ? void 0 : oldConfig.port) || exports.defaultConfig.port
@@ -86,25 +102,34 @@ var getNewInstanceQuestions = function (oldConfig) {
     ];
 };
 var writeInstance = function (pluginInstance) { return __awaiter(void 0, void 0, void 0, function () {
-    var response, _a, _b;
+    var externalConfig, response, _a, _b;
     return __generator(this, function (_c) {
         switch (_c.label) {
             case 0: return [4, prompts(getNewInstanceQuestions(pluginInstance.gluePluginStore.get("minio_credentials")))];
             case 1:
                 response = _c.sent();
-                if (!!response.choice) return [3, 3];
-                response = exports.defaultConfig;
+                if (!response.external) return [3, 3];
+                return [4, prompts(getExternalInstanceQuestions(pluginInstance.gluePluginStore.get("minio_credentials")))];
+            case 2:
+                externalConfig = _c.sent();
+                _c.label = 3;
+            case 3:
+                if (!!response.external) return [3, 5];
+                response.admin_end_point = exports.defaultConfig.admin_end_point;
+                response.cdn_end_point = exports.defaultConfig.cdn_end_point;
                 _a = response;
                 _b = "".concat;
                 return [4, pluginInstance.containerController.getPortNumber()];
-            case 2:
-                _a.port = _b.apply("", [_c.sent()]);
-                return [3, 4];
-            case 3:
-                delete response.choice;
-                _c.label = 4;
             case 4:
-                Object.keys(response).forEach(function (key) { return response[key] = response[key].trim(); });
+                _a.port = _b.apply("", [_c.sent()]);
+                return [3, 6];
+            case 5:
+                response = __assign(__assign({}, response), externalConfig);
+                _c.label = 6;
+            case 6:
+                Object.keys(response).forEach(function (key) {
+                    return key !== 'external' ? response[key] = response[key].trim() : response[key];
+                });
                 pluginInstance.gluePluginStore.set("minio_credentials", response);
                 console.log();
                 console.log("Saved ".concat(pluginInstance.getName(), " config"));
