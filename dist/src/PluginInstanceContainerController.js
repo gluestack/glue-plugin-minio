@@ -218,6 +218,14 @@ var PluginInstanceContainerController = (function () {
                                 switch (_e.label) {
                                     case 0:
                                         if ((_d = this.callerInstance.gluePluginStore.get("minio_credentials")) === null || _d === void 0 ? void 0 : _d.external) {
+                                            (0, createBucket_1.createBucket)(this)
+                                                .then(function () {
+                                                return resolve(true);
+                                            })["catch"](function () {
+                                                console.log("\x1b[33m");
+                                                console.log("Could not create buckets, please create public and private buckets manually");
+                                                console.log("\x1b[0m");
+                                            });
                                             return [2, resolve(true)];
                                         }
                                         _b = (_a = DockerodeHelper).up;
