@@ -196,6 +196,12 @@ export class PluginInstanceContainerController
   getConfig(): any { }
 
   async up() {
+    this.getEnv();
+    await this.getPortNumber();
+    await this.getConsolePortNumber();
+
+    this.setStatus("up");
+
     await new Promise(async (resolve, reject) => {
       if (this.callerInstance.gluePluginStore.get("minio_credentials")?.external) {
         createBucket(this)
@@ -212,68 +218,11 @@ export class PluginInstanceContainerController
 
         return resolve(true);
       }
-
-      DockerodeHelper.up(
-        await this.getDockerJson(),
-        await this.getEnv(),
-        await this.getPortNumber(),
-        this.callerInstance.getName(),
-      )
-        .then(
-          async ({
-            status,
-            containerId,
-          }: {
-            status: "up" | "down";
-            containerId: string;
-          }) => {
-            this.setStatus(status);
-            this.setContainerId(containerId);
-            console.log("\x1b[32m");
-            console.log(`API: http://localhost:${await this.getPortNumber()}`);
-            console.log(
-              `Console: http://localhost:${await this.getConsolePortNumber()}/ open in browser`,
-            );
-            console.log("\x1b[0m", "\x1b[36m");
-            console.log(`Credentials to login in minio console: `);
-            console.log(`username: ${(await this.getEnv()).MINIO_ACCESS_KEY}`);
-            console.log(`password: ${(await this.getEnv()).MINIO_SECRET_KEY}`);
-            console.log("\x1b[0m");
-
-            createBucket(this)
-              .then(() => {
-                return resolve(true);
-              })
-              .catch(() => {
-                console.log("\x1b[33m");
-                console.log(
-                  `Could not create buckets, please create public and private buckets manually`,
-                );
-                console.log("\x1b[0m");
-              });
-          },
-        )
-        .catch((e: any) => {
-          return reject(e);
-        })
-        .catch((e: any) => {
-          return reject(e);
-        });
     });
   }
 
   async down() {
-    await new Promise(async (resolve, reject) => {
-      DockerodeHelper.down(this.getContainerId(), this.callerInstance.getName())
-        .then(() => {
-          this.setStatus("down");
-          this.setContainerId(null);
-          return resolve(true);
-        })
-        .catch((e: any) => {
-          return reject(e);
-        });
-    });
+    this.setStatus("down");
   }
 
   async build() { }

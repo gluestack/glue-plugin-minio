@@ -78,7 +78,7 @@ export async function createBucket(
   let count = 0;
 
   return new Promise((resolve, reject) => {
-    ["MINIO_PUBLIC_BUCKET", "MINIO_PRIVATE_BUCKET"].map(
+    ["MINIO_PUBLIC_BUCKET", "MINIO_PRIVATE_BUCKET"].forEach(
       (bucket: "MINIO_PUBLIC_BUCKET" | "MINIO_PRIVATE_BUCKET") => {
         let interval = setInterval(async () => {
           await tryCreateBucket(containerController, bucket)

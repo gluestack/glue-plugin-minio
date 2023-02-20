@@ -139,7 +139,7 @@ function createBucket(containerController) {
         return __generator(this, function (_a) {
             count = 0;
             return [2, new Promise(function (resolve, reject) {
-                    ["MINIO_PUBLIC_BUCKET", "MINIO_PRIVATE_BUCKET"].map(function (bucket) {
+                    ["MINIO_PUBLIC_BUCKET", "MINIO_PRIVATE_BUCKET"].forEach(function (bucket) {
                         var interval = setInterval(function () { return __awaiter(_this, void 0, void 0, function () {
                             return __generator(this, function (_a) {
                                 switch (_a.label) {

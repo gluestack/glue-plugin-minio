@@ -210,89 +210,33 @@ var PluginInstanceContainerController = (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                            var _a, _b, _c;
-                            var _this = this;
-                            var _d;
-                            return __generator(this, function (_e) {
-                                switch (_e.label) {
-                                    case 0:
-                                        if ((_d = this.callerInstance.gluePluginStore.get("minio_credentials")) === null || _d === void 0 ? void 0 : _d.external) {
-                                            (0, createBucket_1.createBucket)(this)
-                                                .then(function () {
-                                                return resolve(true);
-                                            })["catch"](function () {
-                                                console.log("\x1b[33m");
-                                                console.log("Could not create buckets, please create public and private buckets manually");
-                                                console.log("\x1b[0m");
-                                            });
-                                            return [2, resolve(true)];
-                                        }
-                                        _b = (_a = DockerodeHelper).up;
-                                        return [4, this.getDockerJson()];
-                                    case 1:
-                                        _c = [_e.sent()];
-                                        return [4, this.getEnv()];
-                                    case 2:
-                                        _c = _c.concat([_e.sent()]);
-                                        return [4, this.getPortNumber()];
-                                    case 3:
-                                        _b.apply(_a, _c.concat([_e.sent(), this.callerInstance.getName()]))
-                                            .then(function (_a) {
-                                            var status = _a.status, containerId = _a.containerId;
-                                            return __awaiter(_this, void 0, void 0, function () {
-                                                var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
-                                                return __generator(this, function (_p) {
-                                                    switch (_p.label) {
-                                                        case 0:
-                                                            this.setStatus(status);
-                                                            this.setContainerId(containerId);
-                                                            console.log("\x1b[32m");
-                                                            _c = (_b = console).log;
-                                                            _d = "API: http://localhost:".concat;
-                                                            return [4, this.getPortNumber()];
-                                                        case 1:
-                                                            _c.apply(_b, [_d.apply("API: http://localhost:", [_p.sent()])]);
-                                                            _f = (_e = console).log;
-                                                            _g = "Console: http://localhost:".concat;
-                                                            return [4, this.getConsolePortNumber()];
-                                                        case 2:
-                                                            _f.apply(_e, [_g.apply("Console: http://localhost:", [_p.sent(), "/ open in browser"])]);
-                                                            console.log("\x1b[0m", "\x1b[36m");
-                                                            console.log("Credentials to login in minio console: ");
-                                                            _j = (_h = console).log;
-                                                            _k = "username: ".concat;
-                                                            return [4, this.getEnv()];
-                                                        case 3:
-                                                            _j.apply(_h, [_k.apply("username: ", [(_p.sent()).MINIO_ACCESS_KEY])]);
-                                                            _m = (_l = console).log;
-                                                            _o = "password: ".concat;
-                                                            return [4, this.getEnv()];
-                                                        case 4:
-                                                            _m.apply(_l, [_o.apply("password: ", [(_p.sent()).MINIO_SECRET_KEY])]);
-                                                            console.log("\x1b[0m");
-                                                            (0, createBucket_1.createBucket)(this)
-                                                                .then(function () {
-                                                                return resolve(true);
-                                                            })["catch"](function () {
-                                                                console.log("\x1b[33m");
-                                                                console.log("Could not create buckets, please create public and private buckets manually");
-                                                                console.log("\x1b[0m");
-                                                            });
-                                                            return [2];
-                                                    }
-                                                });
-                                            });
-                                        })["catch"](function (e) {
-                                            return reject(e);
-                                        })["catch"](function (e) {
-                                            return reject(e);
-                                        });
-                                        return [2];
-                                }
-                            });
-                        }); })];
+                    case 0:
+                        this.getEnv();
+                        return [4, this.getPortNumber()];
                     case 1:
+                        _a.sent();
+                        return [4, this.getConsolePortNumber()];
+                    case 2:
+                        _a.sent();
+                        this.setStatus("up");
+                        return [4, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                                var _a;
+                                return __generator(this, function (_b) {
+                                    if ((_a = this.callerInstance.gluePluginStore.get("minio_credentials")) === null || _a === void 0 ? void 0 : _a.external) {
+                                        (0, createBucket_1.createBucket)(this)
+                                            .then(function () {
+                                            return resolve(true);
+                                        })["catch"](function () {
+                                            console.log("\x1b[33m");
+                                            console.log("Could not create buckets, please create public and private buckets manually");
+                                            console.log("\x1b[0m");
+                                        });
+                                        return [2, resolve(true)];
+                                    }
+                                    return [2];
+                                });
+                            }); })];
+                    case 3:
                         _a.sent();
                         return [2];
                 }
@@ -301,27 +245,9 @@ var PluginInstanceContainerController = (function () {
     };
     PluginInstanceContainerController.prototype.down = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                            var _this = this;
-                            return __generator(this, function (_a) {
-                                DockerodeHelper.down(this.getContainerId(), this.callerInstance.getName())
-                                    .then(function () {
-                                    _this.setStatus("down");
-                                    _this.setContainerId(null);
-                                    return resolve(true);
-                                })["catch"](function (e) {
-                                    return reject(e);
-                                });
-                                return [2];
-                            });
-                        }); })];
-                    case 1:
-                        _a.sent();
-                        return [2];
-                }
+                this.setStatus("down");
+                return [2];
             });
         });
     };
