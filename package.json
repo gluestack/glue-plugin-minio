@@ -1,6 +1,6 @@
 {
   "name": "@gluestack/glue-plugin-minio",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "minio devonly plugin for gluestack framework",
   "repository": {
     "type": "git",
@@ -27,6 +27,6 @@
     "typescript": "^4.9.5"
   },
   "peerDependencies": {
-    "@gluestack/framework": "^0.0.x"
+    "@gluestack/glue-plugin-engine": "^0.0.x"
   }
 }
