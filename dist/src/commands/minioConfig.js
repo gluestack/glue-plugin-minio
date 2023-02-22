@@ -114,7 +114,7 @@ var writeInstance = function (pluginInstance) { return __awaiter(void 0, void 0,
                 externalConfig = _c.sent();
                 _c.label = 3;
             case 3:
-                if (!!response.external) return [3, 5];
+                if (!!response.external) return [3, 6];
                 response.admin_end_point = exports.defaultConfig.admin_end_point;
                 response.cdn_end_point = exports.defaultConfig.cdn_end_point;
                 _a = response;
@@ -122,11 +122,14 @@ var writeInstance = function (pluginInstance) { return __awaiter(void 0, void 0,
                 return [4, pluginInstance.containerController.getPortNumber()];
             case 4:
                 _a.port = _b.apply("", [_c.sent()]);
-                return [3, 6];
+                return [4, pluginInstance.containerController.getConsolePortNumber()];
             case 5:
-                response = __assign(__assign({}, response), externalConfig);
-                _c.label = 6;
+                _c.sent();
+                return [3, 7];
             case 6:
+                response = __assign(__assign({}, response), externalConfig);
+                _c.label = 7;
+            case 7:
                 Object.keys(response).forEach(function (key) {
                     return key !== 'external' ? response[key] = response[key].trim() : response[key];
                 });

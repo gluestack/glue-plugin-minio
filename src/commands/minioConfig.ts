@@ -79,6 +79,7 @@ export const writeInstance = async (pluginInstance: PluginInstance) => {
     response.admin_end_point = defaultConfig.admin_end_point;
     response.cdn_end_point = defaultConfig.cdn_end_point;
     response.port = `${await pluginInstance.containerController.getPortNumber()}`;
+    await pluginInstance.containerController.getConsolePortNumber();
   } else {
     response = { ...response, ...externalConfig };
   }
