@@ -202,22 +202,21 @@ export class PluginInstanceContainerController
 
     this.setStatus("up");
 
+    // create buckets
     await new Promise(async (resolve, reject) => {
-      if (this.callerInstance.gluePluginStore.get("minio_credentials")?.external) {
-        createBucket(this)
-          .then(() => {
-            return resolve(true);
-          })
-          .catch(() => {
-            console.log("\x1b[33m");
-            console.log(
-              `Could not create buckets, please create public and private buckets manually`,
-            );
-            console.log("\x1b[0m");
-          });
+      createBucket(this)
+        .then(() => {
+          return resolve(true);
+        })
+        .catch((e) => {
+          console.log("\x1b[33m");
+          console.log(
+            `Could not create buckets, please create public and private buckets manually`,
+          );
+          console.log("\x1b[0m");
+        });
 
-        return resolve(true);
-      }
+      return resolve(true);
     });
   }
 
