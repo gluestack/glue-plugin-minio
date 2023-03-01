@@ -220,20 +220,16 @@ var PluginInstanceContainerController = (function () {
                         _a.sent();
                         this.setStatus("up");
                         return [4, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                                var _a;
-                                return __generator(this, function (_b) {
-                                    if ((_a = this.callerInstance.gluePluginStore.get("minio_credentials")) === null || _a === void 0 ? void 0 : _a.external) {
-                                        (0, createBucket_1.createBucket)(this)
-                                            .then(function () {
-                                            return resolve(true);
-                                        })["catch"](function () {
-                                            console.log("\x1b[33m");
-                                            console.log("Could not create buckets, please create public and private buckets manually");
-                                            console.log("\x1b[0m");
-                                        });
-                                        return [2, resolve(true)];
-                                    }
-                                    return [2];
+                                return __generator(this, function (_a) {
+                                    (0, createBucket_1.createBucket)(this)
+                                        .then(function () {
+                                        return resolve(true);
+                                    })["catch"](function (e) {
+                                        console.log("\x1b[33m");
+                                        console.log("Could not create buckets, please create public and private buckets manually");
+                                        console.log("\x1b[0m");
+                                    });
+                                    return [2, resolve(true)];
                                 });
                             }); })];
                     case 3:
