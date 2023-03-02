@@ -9,4 +9,13 @@ export const parameters = {
   docs: {
     // inlineStories: false,
   },
+  options: {
+    storySort: {
+      method: 'alphabetical',
+      order: [
+        'Minio Plugin',
+        ['Getting Started', 'Requirements', 'How to Install'],
+      ]
+    },
+  },
 };
