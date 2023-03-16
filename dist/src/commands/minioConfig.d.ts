@@ -1,4 +1,4 @@
-import { PluginInstance } from "..//PluginInstance";
+import { PluginInstance } from "../PluginInstance";
 export declare const defaultConfig: {
     external: boolean;
     username: string;

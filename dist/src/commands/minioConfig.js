@@ -49,6 +49,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.writeInstance = exports.defaultConfig = void 0;
 var prompts = require("prompts");
+var write_env_1 = require("../helpers/write-env");
 exports.defaultConfig = {
     external: false,
     username: "gluestack",
@@ -133,6 +134,9 @@ var writeInstance = function (pluginInstance) { return __awaiter(void 0, void 0,
                 Object.keys(response).forEach(function (key) {
                     return key !== 'external' ? response[key] = response[key].trim() : response[key];
                 });
+                return [4, (0, write_env_1.writeEnv)(pluginInstance)];
+            case 8:
+                _c.sent();
                 pluginInstance.gluePluginStore.set("minio_credentials", response);
                 console.log();
                 console.log("Saved ".concat(pluginInstance.getName(), " config"));

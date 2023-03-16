@@ -1,4 +1,5 @@
 const prompts = require("prompts");
+import { writeEnv } from "../helpers/write-env";
 import { PluginInstance } from "../PluginInstance";
 
 interface IQuestion {
@@ -88,6 +89,8 @@ export const writeInstance = async (pluginInstance: PluginInstance) => {
   Object.keys(response).forEach(key =>
     key !== 'external' ? response[key] = response[key].trim() : response[key]
   );
+
+  await writeEnv(pluginInstance);
 
   pluginInstance.gluePluginStore.set("minio_credentials", response);
   console.log();
